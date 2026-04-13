@@ -1,0 +1,72 @@
+# .goreleaser.yaml
+# hya-7 - another ConAcademy joint
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 2
+
+project_name: hya-7
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - main: .
+    id: hya-7
+    binary: hya-7
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+
+archives:
+  - formats: [tar.gz]
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+universal_binaries:
+  - replace: true
+
+release:
+  github:
+    owner: conacademy
+    name: hya-7
+
+brews:
+  - homepage: https://github.com/conacademy/hya-7
+    description: "TUI for the Half Your Age Plus 7 dating age rule"
+    directory: Formula
+    repository:
+      owner: conacademy
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    commit_author:
+      name: goreleaserbot
+      email: goreleaserbot@neomantra.net
+    install: |
+      bin.install "hya-7"

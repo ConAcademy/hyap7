@@ -23,6 +23,9 @@ Controls:
   Tab          Switch between your age and partner age
   Backspace    Clear partner age
   q/Ctrl+C     Quit
+
+Free software released under the MIT License.
+https://github.com/ConAcademy/hya-7
 `)
 }
 

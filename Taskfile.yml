@@ -2,7 +2,22 @@ version: '3'
 
 tasks:
   default:
+    desc: 'Default task is to "build"'
     deps: [build]
+
+  list:
+    desc: 'Lists available tasks'
+    cmds:
+      - task --list-all
+
+  tidy:
+    desc: 'Tidy all'
+    cmds:
+      - go mod tidy
+    sources:
+      - '*.go'
+      - go.mod
+      - go.sum
 
   build:
     desc: Build the hya-7 binary
@@ -25,3 +40,8 @@ tasks:
     desc: Run tests
     cmds:
       - go test ./...
+
+  clean:
+    desc: 'Clean all build products'
+    cmds:
+      - rm -f hya-7
