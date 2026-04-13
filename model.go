@@ -168,10 +168,16 @@ func (m model) View() tea.View {
 	}
 	b.WriteString("\n\n")
 
-	// Range display
+	// Range display with both formulas
 	minA := MinAge(m.yourAge)
 	maxA := MaxAge(m.yourAge)
-	b.WriteString(rangeStyle.Render(fmt.Sprintf("  Acceptable range: %d — %d", minA, maxA)))
+	minFormula := fmt.Sprintf("%d / 2 +  7", m.yourAge)
+	maxFormula := fmt.Sprintf("%d × 2 - 14", m.yourAge)
+	b.WriteString(dimStyle.Render(fmt.Sprintf("  Youngest you should date:   %10s = ", minFormula)))
+	b.WriteString(rangeStyle.Render(fmt.Sprintf("%d", minA)))
+	b.WriteString("\n")
+	b.WriteString(dimStyle.Render(fmt.Sprintf("  Oldest who should date you: %10s = ", maxFormula)))
+	b.WriteString(rangeStyle.Render(fmt.Sprintf("%d", maxA)))
 	b.WriteString("\n")
 
 	// Verdict (if partner age is set)
