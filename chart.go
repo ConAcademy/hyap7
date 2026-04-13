@@ -1,9 +1,9 @@
 package main
 
 import (
+	"charm.land/lipgloss/v2"
 	"github.com/NimbleMarkets/ntcharts/v2/canvas"
 	"github.com/NimbleMarkets/ntcharts/v2/linechart"
-	"charm.land/lipgloss/v2"
 )
 
 var (
@@ -30,7 +30,7 @@ func renderChart(width, height, yourAge, partnerAge int) string {
 
 	lc := linechart.New(
 		w, height,
-		ageMin, ageMax,    // X range: ages
+		ageMin, ageMax, // X range: ages
 		ageMin, ageMax+40, // Y range: acceptable partner ages
 		linechart.WithXYSteps(2, 2),
 		linechart.WithStyles(chartAxisStyle, chartLabelStyle, chartAxisStyle),
@@ -86,5 +86,5 @@ func renderChart(width, height, yourAge, partnerAge int) string {
 		)
 	}
 
-	return "  " + lc.View()
+	return lc.View()
 }
