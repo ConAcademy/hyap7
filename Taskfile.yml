@@ -1,0 +1,23 @@
+version: '3'
+
+tasks:
+  build:
+    desc: Build the hya-7 binary
+    cmds:
+      - go build -o hya-7 .
+    sources:
+      - '*.go'
+      - go.mod
+      - go.sum
+    generates:
+      - hya-7
+
+  run:
+    desc: Run hya-7
+    cmds:
+      - go run .
+
+  test:
+    desc: Run tests
+    cmds:
+      - go test ./...
