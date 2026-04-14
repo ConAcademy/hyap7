@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"charm.land/lipgloss/v2"
 	"github.com/NimbleMarkets/ntcharts/v2/canvas"
 	"github.com/NimbleMarkets/ntcharts/v2/linechart"
@@ -19,6 +21,21 @@ const (
 	ageMin = 14.0
 	ageMax = 80.0
 )
+
+// chartWithLabels wraps a chart view string with axis labels.
+func chartWithLabels(chart, yLabel, xLabel string) string {
+	var b strings.Builder
+	if yLabel != "" {
+		b.WriteString(chartLabelStyle.Render("  " + yLabel))
+		b.WriteString("\n")
+	}
+	b.WriteString(chart)
+	if xLabel != "" {
+		b.WriteString("\n")
+		b.WriteString(chartLabelStyle.Render("  " + strings.Repeat(" ", 40) + xLabel))
+	}
+	return b.String()
+}
 
 // renderChart draws the acceptable-range chart with the user's age highlighted.
 func renderChart(width, height, yourAge, partnerAge int) string {
@@ -86,5 +103,79 @@ func renderChart(width, height, yourAge, partnerAge int) string {
 		)
 	}
 
-	return lc.View()
+	return chartWithLabels(lc.View(), "partner age", "your age")
+}
+
+var (
+	integralStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("141")) // purple
+	widthStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("82"))  // green
+)
+
+// renderIntegralChart draws the cumulative person-years chart.
+func renderIntegralChart(width, height, yourAge int) string {
+	w := width - 4
+	if w < 20 {
+		w = 20
+	}
+
+	// Max cumulative at age 80: 3*6400/4 - 21*80 + 147 = 4800 - 1680 + 147 = 3267
+	maxCumulative := 3300.0
+
+	lc := linechart.New(
+		w, height,
+		ageMin, ageMax,
+		0, maxCumulative,
+		linechart.WithXYSteps(2, 2),
+		linechart.WithStyles(chartAxisStyle, chartLabelStyle, chartAxisStyle),
+	)
+
+	lc.DrawXYAxisAndLabel()
+
+	// Draw the cumulative curve: 3x²/4 - 21x + 147
+	for age := 14.0; age <= ageMax; age += 0.5 {
+		next := age + 0.5
+		y1 := 3*age*age/4 - 21*age + 147
+		y2 := 3*next*next/4 - 21*next + 147
+		if y1 < 0 {
+			y1 = 0
+		}
+		if y2 < 0 {
+			y2 = 0
+		}
+		p1 := canvas.Float64Point{X: age, Y: y1}
+		p2 := canvas.Float64Point{X: next, Y: y2}
+		lc.DrawBrailleLineWithStyle(p1, p2, integralStyle)
+	}
+
+	// Draw the range width line: 3x/2 - 21 (scaled to fit)
+	for age := 14.0; age <= ageMax; age += 0.5 {
+		next := age + 0.5
+		y1 := 3*age/2 - 21
+		y2 := 3*next/2 - 21
+		if y1 < 0 {
+			y1 = 0
+		}
+		if y2 < 0 {
+			y2 = 0
+		}
+		// Scale to make it visible on the same chart (max width ~99 vs max cumulative ~3267)
+		scale := maxCumulative / 120
+		p1 := canvas.Float64Point{X: age, Y: y1 * scale}
+		p2 := canvas.Float64Point{X: next, Y: y2 * scale}
+		lc.DrawBrailleLineWithStyle(p1, p2, widthStyle)
+	}
+
+	// Draw vertical marker at your age
+	ya := float64(yourAge)
+	if ya >= ageMin && ya <= ageMax {
+		cumVal := 3*ya*ya/4 - 21*ya + 147
+		if cumVal < 0 {
+			cumVal = 0
+		}
+		bottom := canvas.Float64Point{X: ya, Y: 0}
+		top := canvas.Float64Point{X: ya, Y: cumVal}
+		lc.DrawBrailleLineWithStyle(bottom, top, markerStyle)
+	}
+
+	return chartWithLabels(lc.View(), "person-years", "your age")
 }

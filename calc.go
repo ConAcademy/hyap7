@@ -28,3 +28,24 @@ func MaxAge(age int) int {
 func InRange(ageA, ageB int) bool {
 	return ageB >= MinAge(ageA) && ageB <= MaxAge(ageA)
 }
+
+// RangeWidth returns the dating range width at a given age: 3*age/2 - 21.
+// This is MaxAge(age) - MinAge(age) in the continuous form.
+func RangeWidth(age int) int {
+	w := 3*age/2 - 21
+	if w < 0 {
+		return 0
+	}
+	return w
+}
+
+// CumulativeRange returns the integral of range width from age 14 to the given age.
+// Represents cumulative person-years of dating eligibility.
+// Formula: 3a²/4 - 21a + 147
+func CumulativeRange(age int) float64 {
+	if age <= 14 {
+		return 0
+	}
+	a := float64(age)
+	return 3*a*a/4 - 21*a + 147
+}

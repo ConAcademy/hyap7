@@ -47,6 +47,44 @@ func TestMaxAge(t *testing.T) {
 	}
 }
 
+func TestRangeWidth(t *testing.T) {
+	tests := []struct {
+		age  int
+		want int
+	}{
+		{14, 0},
+		{16, 3},
+		{20, 9},
+		{30, 24},
+		{40, 39},
+		{50, 54},
+	}
+	for _, tt := range tests {
+		got := RangeWidth(tt.age)
+		if got != tt.want {
+			t.Errorf("RangeWidth(%d) = %d, want %d", tt.age, got, tt.want)
+		}
+	}
+}
+
+func TestCumulativeRange(t *testing.T) {
+	tests := []struct {
+		age  int
+		want float64
+	}{
+		{14, 0},
+		{20, 27},    // 3·400/4 - 21·20 + 147 = 300 - 420 + 147
+		{30, 192},   // 3·900/4 - 21·30 + 147 = 675 - 630 + 147
+		{40, 507},   // 3·1600/4 - 21·40 + 147 = 1200 - 840 + 147
+	}
+	for _, tt := range tests {
+		got := CumulativeRange(tt.age)
+		if got != tt.want {
+			t.Errorf("CumulativeRange(%d) = %v, want %v", tt.age, got, tt.want)
+		}
+	}
+}
+
 func TestInRange(t *testing.T) {
 	tests := []struct {
 		a, b int

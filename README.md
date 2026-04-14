@@ -19,6 +19,7 @@ The folk rule says the youngest person you should date is **(your age / 2) + 7**
  * Forward and inverse formula display
  * Two-person compatibility check with pass/fail verdict
  * Braille line chart of the acceptable dating range zone using [NTCharts](https://github.com/NimbleMarkets/ntcharts)
+ * Integral mode — cumulative person-years of dating eligibility with instantaneous rate
  * Vim-style keyboard controls
 
 ## Installation
@@ -42,6 +43,7 @@ hyap7 [my-age [other-age]]
 | `Shift+←` `Shift+→` / `H` `L` | Adjust age by 5 |
 | `Tab` | Switch between your age and partner age |
 | `Backspace` | Clear partner age |
+| `i` | Toggle integral mode |
 | `q` / `Ctrl+C` | Quit |
 
 ## Building from Source
@@ -76,6 +78,16 @@ The **half-your-age-plus-7** rule defines an acceptable dating age range:
  * **Maximum partner age:** `age × 2 - 14` (the inverse)
 
 This creates an asymmetric range that widens with age.  At 20 your range is 17–26; at 50 it's 32–86.
+
+### Integral Mode
+
+The range width at age *x* is `w(x) = 3x/2 - 21`.  Integrating from age 14 (where the range is zero) to your current age gives **cumulative person-years of dating eligibility**:
+
+```
+∫w(x)dx = 3x²/4 - 21x + 147
+```
+
+Press `i` to toggle integral mode, which charts the cumulative curve and shows the instantaneous rate — how many more person-years you gain next birthday.
 
 ## Dependencies
 

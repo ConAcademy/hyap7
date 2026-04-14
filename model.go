@@ -16,12 +16,13 @@ const (
 )
 
 type model struct {
-	yourAge     int
-	partnerAge  int
-	activeField field
-	width       int
-	height      int
-	quitting    bool
+	yourAge      int
+	partnerAge   int
+	activeField  field
+	integralMode bool
+	width        int
+	height       int
+	quitting     bool
 }
 
 func initialModel() model {
@@ -67,6 +68,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m = m.incrementAge(5)
 		case "shift+left", "H", "J", "shift+down":
 			m = m.incrementAge(-5)
+
+		case "i":
+			m.integralMode = !m.integralMode
 
 		case "backspace", "delete":
 			if m.activeField == fieldPartnerAge {
@@ -135,7 +139,11 @@ func (m model) View() tea.View {
 	var b strings.Builder
 
 	// Title
-	b.WriteString(titleStyle.Render("Half Your Age Plus 7"))
+	if m.integralMode {
+		b.WriteString(titleStyle.Render("Half Your Age Plus 7 — Integral Mode"))
+	} else {
+		b.WriteString(titleStyle.Render("Half Your Age Plus 7"))
+	}
 	b.WriteString("\n\n")
 
 	// Your age input
@@ -151,51 +159,67 @@ func (m model) View() tea.View {
 	}
 	b.WriteString("\n")
 
-	// Partner age input
-	partnerLabel := "  Partner age: "
-	if m.partnerAge > 0 {
-		partnerValue := fmt.Sprintf("[%d]", m.partnerAge)
-		if m.activeField == fieldPartnerAge {
-			b.WriteString(activeStyle.Render(partnerLabel))
-			b.WriteString(activeStyle.Render(partnerValue))
-			b.WriteString(dimStyle.Render("  ◀ ▶  (backspace to clear)"))
-		} else {
-			b.WriteString(dimStyle.Render(partnerLabel))
-			b.WriteString(dimStyle.Render(partnerValue))
-		}
+	if m.integralMode {
+		b.WriteString("\n")
+		// Range width: w(x) = 3x/2 - 21
+		rw := RangeWidth(m.yourAge)
+		b.WriteString(dimStyle.Render(fmt.Sprintf("  Range width w(%d):          3·%d/2 - 21 = ", m.yourAge, m.yourAge)))
+		b.WriteString(rangeStyle.Render(fmt.Sprintf("%d years", rw)))
+		b.WriteString("\n")
+		// Cumulative integral with next-year delta
+		cr := CumulativeRange(m.yourAge)
+		delta := CumulativeRange(m.yourAge+1) - cr
+		b.WriteString(dimStyle.Render(fmt.Sprintf("  Cumulative ∫w(x)dx from 14 to %d:       ", m.yourAge)))
+		b.WriteString(rangeStyle.Render(fmt.Sprintf("%.0f person-years", cr)))
+		b.WriteString(dimStyle.Render(fmt.Sprintf("  (+%.0f next year)", delta)))
+		b.WriteString("\n\n")
 	} else {
-		b.WriteString(dimStyle.Render(partnerLabel + "(tab to set)"))
-	}
-	b.WriteString("\n\n")
-
-	// Range display with both formulas
-	minA := MinAge(m.yourAge)
-	maxA := MaxAge(m.yourAge)
-	minFormula := fmt.Sprintf("%d / 2 +  7", m.yourAge)
-	maxFormula := fmt.Sprintf("%d × 2 - 14", m.yourAge)
-	b.WriteString(dimStyle.Render(fmt.Sprintf("  Youngest you should date:   %10s = ", minFormula)))
-	b.WriteString(rangeStyle.Render(fmt.Sprintf("%d", minA)))
-	b.WriteString("\n")
-	b.WriteString(dimStyle.Render(fmt.Sprintf("  Oldest who should date you: %10s = ", maxFormula)))
-	b.WriteString(rangeStyle.Render(fmt.Sprintf("%d", maxA)))
-	b.WriteString("\n")
-
-	// Verdict (if partner age is set)
-	if m.partnerAge > 0 {
-		if InRange(m.yourAge, m.partnerAge) {
-			b.WriteString(passStyle.Render(fmt.Sprintf("  ✓ %d is in range!", m.partnerAge)))
-		} else {
-			diff := 0
-			if m.partnerAge < minA {
-				diff = minA - m.partnerAge
+		// Partner age input
+		partnerLabel := "  Partner age: "
+		if m.partnerAge > 0 {
+			partnerValue := fmt.Sprintf("[%d]", m.partnerAge)
+			if m.activeField == fieldPartnerAge {
+				b.WriteString(activeStyle.Render(partnerLabel))
+				b.WriteString(activeStyle.Render(partnerValue))
+				b.WriteString(dimStyle.Render("  ◀ ▶  (backspace to clear)"))
 			} else {
-				diff = m.partnerAge - maxA
+				b.WriteString(dimStyle.Render(partnerLabel))
+				b.WriteString(dimStyle.Render(partnerValue))
 			}
-			b.WriteString(failStyle.Render(fmt.Sprintf("  ✗ %d is out of range by %d year(s)", m.partnerAge, diff)))
+		} else {
+			b.WriteString(dimStyle.Render(partnerLabel + "(tab to set)"))
+		}
+		b.WriteString("\n\n")
+
+		// Range display with both formulas
+		minA := MinAge(m.yourAge)
+		maxA := MaxAge(m.yourAge)
+		minFormula := fmt.Sprintf("%d / 2 +  7", m.yourAge)
+		maxFormula := fmt.Sprintf("%d × 2 - 14", m.yourAge)
+		b.WriteString(dimStyle.Render(fmt.Sprintf("  Youngest you should date:   %10s = ", minFormula)))
+		b.WriteString(rangeStyle.Render(fmt.Sprintf("%d", minA)))
+		b.WriteString("\n")
+		b.WriteString(dimStyle.Render(fmt.Sprintf("  Oldest who should date you: %10s = ", maxFormula)))
+		b.WriteString(rangeStyle.Render(fmt.Sprintf("%d", maxA)))
+		b.WriteString("\n")
+
+		// Verdict (if partner age is set)
+		if m.partnerAge > 0 {
+			if InRange(m.yourAge, m.partnerAge) {
+				b.WriteString(passStyle.Render(fmt.Sprintf("  ✓ %d is in range!", m.partnerAge)))
+			} else {
+				diff := 0
+				if m.partnerAge < minA {
+					diff = minA - m.partnerAge
+				} else {
+					diff = m.partnerAge - maxA
+				}
+				b.WriteString(failStyle.Render(fmt.Sprintf("  ✗ %d is out of range by %d year(s)", m.partnerAge, diff)))
+			}
+			b.WriteString("\n")
 		}
 		b.WriteString("\n")
 	}
-	b.WriteString("\n")
 
 	// Chart
 	chartWidth := m.width
@@ -209,11 +233,19 @@ func (m model) View() tea.View {
 	if chartHeight > 30 {
 		chartHeight = 30
 	}
-	b.WriteString(renderChart(chartWidth, chartHeight, m.yourAge, m.partnerAge))
+	if m.integralMode {
+		b.WriteString(renderIntegralChart(chartWidth, chartHeight, m.yourAge))
+	} else {
+		b.WriteString(renderChart(chartWidth, chartHeight, m.yourAge, m.partnerAge))
+	}
 	b.WriteString("\n")
 
 	// Help
-	b.WriteString(helpStyle.Render("  ←→/hljk: ±1 age  shift: ±5  tab: switch field  backspace: clear partner  q: quit"))
+	if m.integralMode {
+		b.WriteString(helpStyle.Render("  ←→/hljk: ±1 age  shift: ±5  i: range mode  q: quit"))
+	} else {
+		b.WriteString(helpStyle.Render("  ←→/hljk: ±1 age  shift: ±5  tab: partner  backspace: clear  i: integral  q: quit"))
+	}
 	b.WriteString("\n")
 
 	v := tea.NewView(b.String())
