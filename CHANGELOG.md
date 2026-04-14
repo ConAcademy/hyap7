@@ -1,4 +1,4 @@
-# `hya-7` CHANGELOG
+# `hyap7` CHANGELOG
 
 ## v0.1.0
 
@@ -7,5 +7,5 @@
   - Two-person compatibility check with pass/fail verdict
   - NTCharts v2 braille line chart of the acceptable dating range zone
   - Vim-style keyboard controls
-  - CLI arguments: `hya-7 [my-age [other-age]]`
+  - CLI arguments: `hyap7 [my-age [other-age]]`
   - We found [bug #16 NTCharts!](https://github.com/NimbleMarkets/ntcharts/issues/16)

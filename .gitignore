@@ -1,8 +1,8 @@
-# hya-7 .gitignore
+# hyap7 .gitignore
 
 .task
 .DS_Store
 bin/
 dist/
-hya-7
+hyap7
 tea_debug.log

@@ -1,4 +1,4 @@
-module github.com/evanwies/hya-7
+module github.com/ConAcademy/hyap7
 
 go 1.26.2
 

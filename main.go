@@ -9,7 +9,7 @@ import (
 )
 
 func usage() {
-	fmt.Fprintf(os.Stderr, `Usage: hya-7 [my-age [other-age]]
+	fmt.Fprintf(os.Stderr, `Usage: hyap7 [my-age [other-age]]
 
 A TUI for exploring the "Half Your Age Plus 7" dating age rule.
 
@@ -25,7 +25,7 @@ Controls:
   q/Ctrl+C     Quit
 
 Free software released under the MIT License.
-https://github.com/ConAcademy/hya-7
+https://github.com/ConAcademy/hyap7
 `)
 }
 

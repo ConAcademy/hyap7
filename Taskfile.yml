@@ -20,19 +20,19 @@ tasks:
       - go.sum
 
   build:
-    desc: Build the hya-7 binary
+    desc: Build the hyap7 binary
     deps: [test]
     cmds:
-      - go build -o hya-7 .
+      - go build -o hyap7 .
     sources:
       - '*.go'
       - go.mod
       - go.sum
     generates:
-      - hya-7
+      - hyap7
 
   run:
-    desc: Run hya-7
+    desc: Run hyap7
     cmds:
       - go run .
 
@@ -43,5 +43,37 @@ tasks:
 
   clean:
     desc: 'Clean all build products'
+    deps: [ clean-gifs ]
     cmds:
-      - rm -f hya-7
+      - rm -f hyap7
+
+###############################################################################
+# GIF Generation from VHS Cassettes
+
+  deps-gifs:
+    desc: 'Install dependencies for GIF generation'
+    cmds:
+      - go install github.com/charmbracelet/vhs@latest
+      - brew install imagemagick
+
+  validate-tapes:
+    desc: 'Validate vhs tapes for GIF generation'
+    cmds:
+      - vhs validate ./etc/demo.tape
+    sources:
+      - ./etc/demo.tape
+
+  build-gifs:
+    desc: 'Build vhs cassette gifs'
+    deps: [build, validate-tapes]
+    cmds:
+      - vhs --output ./etc/demo.gif ./etc/demo.tape
+    sources:
+      - ./etc/demo.tape
+    generates:
+      - ./etc/demo.gif
+
+  clean-gifs:
+    desc: 'Cleans vhs cassette gifs'
+    cmds:
+      - rm -f ./etc/demo.gif
