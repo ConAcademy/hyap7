@@ -57,6 +57,7 @@ tasks:
 
   build-assets:
     desc: 'Populate web/ with wasm_exec.js, booba/, and ghostty-web/'
+    deps: [tidy]
     cmds:
       - go tool booba-assets web/
     generates:

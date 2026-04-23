@@ -6,12 +6,41 @@ It is a Golang application using [BubbleTea v2](https://charm.land/bubbletea) fo
 
 ## Build & Run
 
+Native binary:
+
 ```
 go build -o hyap7 .
 ./hyap7
 ```
 
 Or directly: `go run .`
+
+Web (WASM) build for GitHub Pages:
+
+```
+go tool booba-wasm-build -o web/app.wasm .
+go tool booba-assets web/
+```
+
+Serve locally: `task serve` (requires `npx serve`)
+
+## Test
+
+```
+go test ./...
+```
+
+## File Layout
+
+| File | Purpose |
+|------|---------|
+| `main.go` | Entrypoint, uses `booba.Run` for native + WASM compatibility |
+| `model.go` | BubbleTea model: state, Update (key handling), View (rendering) |
+| `calc.go` | Pure functions: `MinAge()`, `MaxAge()`, `InRange()` |
+| `calc_test.go` | Table-driven tests for calc functions |
+| `chart.go` | NTCharts line chart builder for the acceptable-range visualization |
+| `web/index.html` | Static page for GitHub Pages (customize freely) |
+| `.github/workflows/pages.yml` | Build WASM + deploy to GitHub Pages |
 
 ## Test
 
