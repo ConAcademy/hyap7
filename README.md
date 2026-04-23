@@ -5,6 +5,8 @@
     <a href="https://pkg.go.dev/github.com/ConAcademy/hyap7?tab=doc"><img src="https://godoc.org/github.com/golang/gddo?status.svg" alt="GoDoc"></a>
 </p>
 
+[Check out the online WASM demo](https://conacademy.github.io/hyap7).
+
 `hyap7` is a terminal UI for exploring the ["Half Your Age Plus 7"](https://en.wikipedia.org/wiki/Age_disparity_in_sexual_relationships#The_%22half-your-age-plus-seven%22_rule) dating age rule, allowing exploration of quantitative ethics in the terminal.
 
 <p><img src="etc/demo.gif" width="600" alt="hyap7 demo"></p>
@@ -27,7 +29,7 @@ The folk rule says the youngest person you should date is **(your age / 2) + 7**
  * Download from the [`hyap7` releases page](https://github.com/ConAcademy/hyap7/releases)
  * Or install with [Homebrew](https://brew.sh):
  ```
- brew install ConAcademy/homebrew-tap/hyap7`
+ brew install ConAcademy/homebrew-tap/hyap7
  ```
  * Or [build from source](#building-from-source)
 

@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	tea "charm.land/bubbletea/v2"
+	booba "github.com/NimbleMarkets/go-booba"
 )
 
 func usage() {
@@ -64,7 +64,7 @@ func main() {
 		m.partnerAge = age
 	}
 
-	p := tea.NewProgram(m)
+	p := booba.NewProgram(m)
 	if _, err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
