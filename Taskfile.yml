@@ -12,6 +12,7 @@ tasks:
 
   tidy:
     desc: 'Tidy all'
+    run: once
     cmds:
       - go mod tidy
     sources:
@@ -21,7 +22,7 @@ tasks:
 
   build:
     desc: Build the hyap7 binary
-    deps: [test]
+    deps: [tidy]
     cmds:
       - go build -o hyap7 .
     sources:
@@ -33,19 +34,57 @@ tasks:
 
   run:
     desc: Run hyap7
+    deps: [tidy]
     cmds:
       - go run .
 
   test:
     desc: Run tests
+    deps: [tidy]
     cmds:
       - go test ./...
+
+  build-wasm:
+    desc: 'Compile hyap7 to WASM'
+    deps: [tidy]
+    cmds:
+      - go tool booba-wasm-build -o web/app.wasm .
+    sources:
+      - '*.go'
+      - go.mod
+    generates:
+      - web/app.wasm
+
+  build-assets:
+    desc: 'Populate web/ with wasm_exec.js, booba/, and ghostty-web/'
+    cmds:
+      - go tool booba-assets web/
+    generates:
+      - web/wasm_exec.js
+      - web/booba/booba.js
+      - web/ghostty-web/ghostty-web.js
+
+  build-web:
+    desc: 'Build WASM binary and web assets'
+    deps:
+      - build-wasm
+      - build-assets
+
+  serve:
+    desc: 'Serve web/ locally on http://localhost:3000'
+    deps: [build-web]
+    cmds:
+      - npx serve web
 
   clean:
     desc: 'Clean all build products'
     deps: [ clean-gifs ]
     cmds:
       - rm -f hyap7
+      - rm -f web/app.wasm
+      - rm -f web/wasm_exec.js
+      - rm -rf web/booba
+      - rm -rf web/ghostty-web
 
 ###############################################################################
 # GIF Generation from VHS Cassettes
